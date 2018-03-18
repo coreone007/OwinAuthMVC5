@@ -1,0 +1,138 @@
+﻿@model OwinAuth.ViewModels.AnnouncementViewModel
+@using OwinAuth.Utils;
+@{
+    ViewBag.Title = "Create";
+}
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+@*<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>*@
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script type="text/javascript">
+    function fileCheck(obj) {
+        var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
+        if ($.inArray($(obj).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Only '.jpeg','.jpg', '.png', '.gif', '.bmp' formats are allowed.");
+            $(obj).val("");
+        }
+    }
+    $(document).ready(function(){
+        $("textarea").keyup(function(){
+            var max = 500;
+            var remind = max - $("#Details").val().length;
+            $("#remind").text("Max 500 chars,. Remaining "+remind+" char(s)");
+        });
+    });
+    @*function onSuccess(response) {
+        if (!response.Success) {
+            $("#message").text(response.Message)
+        } else {
+            $("#message").text("")
+            window.location.href = '@Url.Action("Index", "Annoucements")';
+        }
+    }*@
+    function onSuccess(response) {
+        if (response.param1 == 200) {
+            window.location.href = '@Url.Action("Index", "Annoucements")';
+        }
+    }
+    function OnFailure(response) {
+        alert('HTTP Status Code: ' + response.param1 + '  Error Message: ' + response.param2);
+    }
+</script>
+
+@using (Ajax.BeginForm("Create", "Annoucements", new AjaxOptions { HttpMethod = "POST", OnSuccess = "onSuccess", OnFailure = "OnFailure" }, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger"})
+        <div class="form-group">
+            @Html.LabelFor(model => model.Title, UI.AnnouncementTitle, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Details, UI.AnnouncementDetails, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.Details, new { htmlAttributes = new { } })
+                @Html.ValidationMessageFor(model => model.Details, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-md-2"></span>
+            <div class="col-md-10">
+                <span id="remind">Max 500 chars,. Remaining 200 char(s)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.StartDate, UI.PublishedDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EndDate, UI.ExpiryDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @*<div class="form-group">
+            <span class="col-md-2"></span>
+            <div class="col-md-10">
+                <input type="file" lang="en" name="ImageData" id="ImageData" onchange="fileCheck(this);" />
+                <span id="imagenote">
+                    Recommended resolution is 600x400.<br />
+                    Image type is jpeg, png.<br />
+                    Maximum size is 500KB.
+                </span>
+            </div>
+        </div>*@
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.ImageStore, new { @class = "col-sm-2 control-label" })
+            <div class="col-sm-10">
+                @Html.TextBoxFor(m => m.ImageStore, new { @class = "form-control", type = "file" })
+                @Html.ValidationMessageFor(m => m.ImageStore)
+            </div>
+        </div>   
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsPopup, UI.ShowAsPopup, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.IsPopup)
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Priority, UI.Order, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Priority, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Cancel" class="btn btn-default" onclick="location.href='@Url.Action("Index","Annoucements")';" />
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <span id="message"></span>
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
